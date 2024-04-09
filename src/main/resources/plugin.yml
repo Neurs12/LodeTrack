@@ -1,0 +1,15 @@
+name: LodeTrack
+version: '${project.version}'
+main: dev.neurs.lodetrack.LodeTrack
+api-version: '1.20'
+
+commands:
+  lodetrack:
+    description: Give player a tracking compass.
+    default: true
+    usage: /lodetrack
+
+permissions:
+  lodetrack.give:
+    default: true
+    description: Gives a player the tracking compass.
