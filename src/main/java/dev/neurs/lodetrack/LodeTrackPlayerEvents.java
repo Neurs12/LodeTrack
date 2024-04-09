@@ -8,8 +8,10 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.CompassMeta;
@@ -26,7 +28,7 @@ public class LodeTrackPlayerEvents implements Listener {
 
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getAction().toString().contains("RIGHT")) {
+        if (event.getHand() == EquipmentSlot.HAND && (event.getAction() == Action.RIGHT_CLICK_BLOCK || event.getAction() == Action.RIGHT_CLICK_AIR)) {
             ItemStack item = event.getItem();
             if (item == null) return;
             if (item.getType() == Material.COMPASS) {
@@ -96,6 +98,23 @@ public class LodeTrackPlayerEvents implements Listener {
 //            tracker.runTaskTimerAsynchronously(this.plugin, 0L, 20L);
 //            trackingPlayers.put(player, tracker);
 
+            if (trackingPlayer == null) {
+                player.sendMessage(ChatColor.RED + "The player you're trying to track does not exist.");
+                return;
+            }
+
+            if (!trackingPlayer.isOnline()) {
+                player.sendMessage(ChatColor.RED + "The player you're trying to track does not appears to be online.");
+                return;
+            }
+
+            if (!player.getWorld().equals(trackingPlayer.getWorld())) {
+                player.sendMessage(ChatColor.RED + "You're not in the same dimension with " + ChatColor.GREEN + trackingPlayer.getName());
+                return;
+            }
+
+            requestTrackTable.put(player.getName(), trackingPlayer.getName());
+
             TextComponent acceptRequest = new TextComponent(ChatColor.GREEN + "" + ChatColor.UNDERLINE + ChatColor.BOLD + "ACCEPT");
             acceptRequest.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, new Text("Accept tracking request from " + player.getName())));
             acceptRequest.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/lodetrack accept " + player.getName()));
@@ -110,12 +129,9 @@ public class LodeTrackPlayerEvents implements Listener {
             requestMessage.append("  ");
             requestMessage.append(denyRequest);
 
-            assert trackingPlayer != null;
             trackingPlayer.spigot().sendMessage(requestMessage.create());
 
-            player.sendMessage("Tracking request sent to " + ChatColor.GREEN + player.getName() + ChatColor.WHITE + "! Waiting for response...");
-
-            requestTrackTable.put(player.getName(), trackingPlayer.getName());
+            player.sendMessage("Tracking request sent to " + ChatColor.GREEN + trackingPlayer.getName() + ChatColor.WHITE + "! Waiting for response...");
 
             player.closeInventory();
         }

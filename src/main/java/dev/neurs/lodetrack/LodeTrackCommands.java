@@ -143,6 +143,7 @@ public class LodeTrackCommands implements CommandExecutor {
             @Override
             public void run() {
                 if (trackedPlayer == null) {
+                    trackerPlayer.sendMessage(ChatColor.RED + "Something went wrong... Compass is now pointing at the last succeeded location pull.");
                     cancel();
                     return;
                 }
@@ -151,12 +152,12 @@ public class LodeTrackCommands implements CommandExecutor {
                         lodeMeta.setLodestone(trackedPlayer.getLocation());
                         lodeTracking.setItemMeta(lodeMeta);
                     } else {
-                        trackerPlayer.sendMessage(trackedPlayer.getName() + " is no longer in your dimension. Compass is now point at the portal's location.");
+                        trackerPlayer.sendMessage(trackedPlayer.getName() + " is no longer in your dimension. Compass is now pointing at the portal's location.");
                         cancel();
                     }
                 } else {
                     try {
-                        trackerPlayer.sendMessage(ChatColor.GREEN + trackedPlayer.getName() + ChatColor.WHITE + " went offline. Compass is now point at their last online location.");
+                        trackerPlayer.sendMessage(ChatColor.GREEN + trackedPlayer.getName() + ChatColor.WHITE + " went offline. Compass is now pointing at their last online location.");
                     } catch (Exception ignored) { }
                     try {
                         trackedPlayer.sendMessage(ChatColor.GREEN + trackerPlayer.getName() + ChatColor.WHITE + " went offline. You are not being tracked by them.");
